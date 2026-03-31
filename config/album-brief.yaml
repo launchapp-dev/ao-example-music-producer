@@ -1,0 +1,71 @@
+# Album Brief
+# Edit these fields to configure your album production pipeline.
+
+# Artist Information
+artist_name: "Nova Dusk"
+artist_bio_short: >
+  Indie electronic artist blending atmospheric synth textures with confessional songwriting.
+  Based in Los Angeles, influenced by the space between digital and analog worlds.
+
+# Album Details
+album_title: "TBD"  # Leave as TBD for the AI to decide, or set a specific title
+genre:
+  primary: "indie electronic"
+  subgenres:
+    - "dream pop"
+    - "synthwave"
+    - "ambient"
+
+# Creative Direction
+theme_direction: >
+  A journey through late-night introspection — the feeling of being simultaneously
+  connected to everything digitally and deeply alone emotionally. Explores themes of
+  digital intimacy, nostalgia for simpler times, and finding beauty in urban isolation.
+
+influences:
+  artists:
+    - "Lana Del Rey"
+    - "Bon Iver"
+    - "James Blake"
+    - "Washed Out"
+    - "Phoebe Bridgers"
+  albums:
+    - "For Emma, Forever Ago — Bon Iver"
+    - "Ultraviolence — Lana Del Rey"
+    - "Overgrown — James Blake"
+  sonic_references:
+    - "warm analog synths with tape saturation"
+    - "spacious reverb-drenched production"
+    - "intimate vocal performance with subtle electronic processing"
+    - "melancholic chord progressions that resolve unexpectedly"
+
+# Track Configuration
+track_count: 10
+bpm_range:
+  min: 68
+  max: 130
+preferred_keys:
+  - "D minor"
+  - "A minor"
+  - "F major"
+  - "E major"
+mood_keywords:
+  - "melancholic"
+  - "introspective"
+  - "cinematic"
+  - "intimate"
+  - "luminous"
+  - "haunted"
+
+# Target Audience
+target_audience:
+  age_range: "22–35"
+  description: >
+    Late-night listeners, creative professionals, indie music fans who use music
+    for emotional processing. Fans of Pitchfork's Best New Music picks.
+
+# Release Timeline
+target_release_date: "2026-06-15"
+singles_schedule:
+  lead_single: "2026-04-21"    # 8 weeks before album
+  second_single: "2026-05-12"  # 4 weeks before album

@@ -1,0 +1,505 @@
+phases:
+
+  # ─── Phase 1: Develop Album Concept ───────────────────────────────────────
+  develop-concept:
+    mode: agent
+    agent: creative-director
+    directive: |
+      Develop the full album concept for this project. Your inputs and outputs:
+
+      INPUTS — Read these files:
+        - config/album-brief.yaml (artist name, genre, theme, track count, BPM range, reference artists)
+
+      PROCESS — Use sequential-thinking to work through:
+        1. Overarching album narrative: what is the story arc from Track 1 to the final track?
+        2. Emotional journey: map the emotional arc across tracks (tension, release, resolution)
+        3. Sonic palette: 5–8 adjectives that describe the album's sound world
+        4. Thematic motifs: recurring themes/images that thread through lyrics and visuals
+        5. Track listing: working titles, moods, BPM range, suggested key, energy level (1–10) per track
+
+      OUTPUTS — Write these files:
+        data/album-concept.json with structure:
+          {
+            "narrative": "...",
+            "emotional_arc": ["opening mood", "...", "closing mood"],
+            "sonic_palette": ["adjective1", ...],
+            "thematic_motifs": ["motif1", ...],
+            "concept_statement": "2–3 sentence artist statement"
+          }
+        data/track-listing.json with structure:
+          {
+            "tracks": [
+              {
+                "number": 1,
+                "working_title": "...",
+                "mood": "...",
+                "bpm_range": [120, 128],
+                "suggested_key": "Am",
+                "energy_level": 7,
+                "narrative_role": "..."
+              }
+            ]
+          }
+
+      Ensure the track listing flows naturally — consider energy curves, key transitions, and pacing.
+    capabilities:
+      mutates_state: true
+      writes_files: true
+
+  # ─── Phase 2: Review Concept (Decision Gate) ──────────────────────────────
+  review-concept:
+    mode: agent
+    agent: creative-director
+    directive: |
+      Review the album concept and track listing for quality and coherence.
+
+      READ:
+        - data/album-concept.json
+        - data/track-listing.json
+        - config/album-brief.yaml
+
+      EVALUATE against these criteria:
+        1. Narrative coherence: Does the album tell a clear story with a beginning, middle, and end?
+        2. Track flow: Does the energy/tempo arc make sense? Are there jarring transitions?
+        3. Key relationships: Are the suggested keys compatible or interestingly contrasted?
+        4. Alignment with brief: Does the concept match the artist's stated genre, themes, and influences?
+        5. Originality: Does this feel like a distinctive creative vision, not generic?
+
+      DECISION:
+        - "approve" if all 5 criteria are met and the concept is strong
+        - "rework" if there are specific coherence or quality issues (explain each issue clearly)
+
+      Output your verdict in the required JSON format with a brief reasoning statement.
+    capabilities:
+      mutates_state: false
+      writes_files: false
+    decision_contract:
+      required_fields: [verdict, reasoning]
+
+  # ─── Phase 3: Write Lyrics ────────────────────────────────────────────────
+  write-lyrics:
+    mode: agent
+    agent: lyricist
+    directive: |
+      Write full structured lyrics for every track on the album.
+
+      READ:
+        - data/album-concept.json
+        - data/track-listing.json
+
+      FOR EACH TRACK:
+        1. Write verse 1, pre-chorus (if applicable), chorus, verse 2, bridge, outro
+        2. Include syllable count per line in parentheses at line end
+        3. Note rhyme scheme (e.g., ABAB) per section
+        4. Mark the primary hook/title line with an asterisk
+        5. Ensure lyrical themes connect to the track's narrative role in the album
+
+      OUTPUTS:
+        data/lyrics/track-{nn}-{title}.json per track where nn is zero-padded number:
+          {
+            "track_number": 1,
+            "title": "...",
+            "sections": [
+              {
+                "name": "Verse 1",
+                "lines": [
+                  {"text": "...", "syllables": 8, "rhyme_position": "A"},
+                  ...
+                ]
+              }
+            ],
+            "hook_line": "...",
+            "rhyme_scheme": "ABAB"
+          }
+
+        data/lyrics-summary.json:
+          {
+            "album_lyrical_themes": ["..."],
+            "tracks": [
+              {"number": 1, "title": "...", "primary_theme": "...", "hook": "..."}
+            ]
+          }
+    capabilities:
+      mutates_state: true
+      writes_files: true
+
+  # ─── Phase 4: Compose Tracks ──────────────────────────────────────────────
+  compose-tracks:
+    mode: agent
+    agent: composer
+    directive: |
+      Design full musical compositions for every track.
+
+      READ:
+        - data/album-concept.json
+        - data/track-listing.json
+        - data/lyrics-summary.json (for lyrical meter alignment)
+
+      FOR EACH TRACK:
+        1. Set exact BPM (within the track's BPM range), key signature, time signature, mode
+        2. Write chord progression per section using Roman numeral analysis + actual chord names in key
+        3. Describe melody contour: pitch direction (ascending/descending), interval character, rhythm feel
+        4. Design arrangement sections with entry/exit points for main instruments
+        5. Note any modulations, key changes, or unusual harmonic moves
+
+      OUTPUTS:
+        data/compositions/track-{nn}-{title}.json per track:
+          {
+            "track_number": 1,
+            "title": "...",
+            "bpm": 124,
+            "key": "A minor",
+            "time_signature": "4/4",
+            "mode": "natural minor",
+            "chord_progressions": {
+              "verse": {"roman": ["i", "VI", "III", "VII"], "chords": ["Am", "F", "C", "G"]},
+              "chorus": {"roman": ["i", "VII", "VI", "VII"], "chords": ["Am", "G", "F", "G"]}
+            },
+            "melody": {
+              "character": "...",
+              "contour": "...",
+              "hook_rhythm": "..."
+            },
+            "arrangement": [
+              {"section": "Intro", "bars": "1-8", "instruments": ["synth pad", "kick drum"]},
+              ...
+            ]
+          }
+
+        data/compositions-summary.json:
+          {
+            "key_map": [{"track": 1, "key": "Am", "bpm": 124}],
+            "harmonic_notes": "...",
+            "energy_arc": "..."
+          }
+    capabilities:
+      mutates_state: true
+      writes_files: true
+
+  # ─── Phase 5: Produce Tracks ──────────────────────────────────────────────
+  produce-tracks:
+    mode: agent
+    agent: producer
+    directive: |
+      Create full production specifications for every track.
+
+      READ:
+        - data/album-concept.json
+        - data/track-listing.json
+        - data/lyrics-summary.json
+        - data/compositions/track-*.json (all composition files)
+        - data/compositions-summary.json
+
+      FOR EACH TRACK:
+        1. Specify instrumentation: list every instrument/sound source with its role
+        2. Sound design notes: describe synth patch character, drum kit sound, FX units
+        3. Mixing directives: rough level (dBFS), panning position, reverb/delay type, compression
+        4. Write a detailed AI music generation prompt (60–100 words, extremely specific)
+        5. Note any production techniques that define the track's sound
+
+      OUTPUTS:
+        data/production/track-{nn}-{title}.json per track:
+          {
+            "track_number": 1,
+            "title": "...",
+            "instrumentation": [
+              {"instrument": "lead synth", "role": "melody", "character": "warm, slightly detuned Juno-106 style"}
+            ],
+            "sound_design": "...",
+            "mixing": {
+              "buss": "drums at -6dBFS, bass at -8dBFS, vocals at -3dBFS",
+              "reverb": "large hall on vocals (30% wet), room on snare (15% wet)",
+              "panning": "hi-hats panned L/R alternating, guitars 40L/40R"
+            },
+            "audio_generation_prompt": "..."
+          }
+
+        data/production-summary.json:
+          {
+            "production_approach": "...",
+            "sonic_cohesion_notes": "...",
+            "reference_tracks": ["Artist - Song", ...],
+            "tracks": [{"number": 1, "title": "...", "key_sound": "..."}]
+          }
+    capabilities:
+      mutates_state: true
+      writes_files: true
+
+  # ─── Phase 6: Generate Reference Audio (Command) ──────────────────────────
+  generate-reference-audio:
+    mode: command
+    command:
+      program: bash
+      args: ["-c", "bash scripts/generate-audio.sh"]
+      cwd_mode: project_root
+      timeout_secs: 600
+    directive: |
+      Execute scripts/generate-audio.sh to generate reference audio for all tracks via Replicate API.
+      The script reads production JSON files and writes audio to output/audio/.
+      Falls back to placeholder files if REPLICATE_API_TOKEN is not set.
+
+  # ─── Phase 7: Analyze Audio (Command) ────────────────────────────────────
+  analyze-audio:
+    mode: command
+    command:
+      program: bash
+      args: ["-c", "bash scripts/analyze-audio.sh"]
+      cwd_mode: project_root
+      timeout_secs: 300
+    directive: |
+      Execute scripts/analyze-audio.sh to analyze generated audio files.
+      The script uses ffprobe to extract duration, sample rate, and amplitude metrics.
+      Writes data/audio-analysis.json.
+
+  # ─── Phase 8: Master Collection ───────────────────────────────────────────
+  master-collection:
+    mode: agent
+    agent: producer
+    directive: |
+      Create the mastering plan for the complete album.
+
+      READ:
+        - data/audio-analysis.json
+        - data/production-summary.json
+        - data/productions/track-*.json (all production files)
+        - data/track-listing.json
+
+      TASKS:
+        1. Review audio analysis for any tracks with clipping, low levels, or frequency imbalances
+        2. Write per-track mastering directives: EQ adjustments (describe boosts/cuts by frequency band),
+           multi-band compression settings, limiting (ceiling, true peak), stereo width adjustments
+        3. Normalize loudness targets to -14 LUFS integrated (streaming standard)
+        4. Define final track order (may differ from working order), gap durations, any crossfades
+        5. Note if any tracks need re-production before mastering (flag specifically)
+
+      OUTPUT:
+        data/mastering-plan.json:
+          {
+            "loudness_target_lufs": -14,
+            "final_track_order": [1, 3, 2, ...],
+            "tracks": [
+              {
+                "track_number": 1,
+                "title": "...",
+                "eq_directives": "...",
+                "compression": "...",
+                "limiting": "ceiling -1 dBTP, threshold -2 dBFS",
+                "stereo_width": "...",
+                "gap_after_secs": 2
+              }
+            ],
+            "album_cohesion_notes": "..."
+          }
+    capabilities:
+      mutates_state: true
+      writes_files: true
+
+  # ─── Phase 9: Review Production (Decision Gate) ───────────────────────────
+  review-production:
+    mode: agent
+    agent: creative-director
+    directive: |
+      Review the entire production for quality and album cohesion before moving to artwork and release.
+
+      READ:
+        - data/album-concept.json
+        - data/lyrics-summary.json
+        - data/compositions-summary.json
+        - data/production-summary.json
+        - data/audio-analysis.json
+        - data/mastering-plan.json
+
+      EVALUATE:
+        1. Completeness: Are all tracks fully specified through production and mastering?
+        2. Sonic cohesion: Do the productions form a unified album sound?
+        3. Audio quality: Does the audio analysis show acceptable technical specs?
+        4. Alignment: Does the production serve the original concept and mood for each track?
+        5. Mastering: Is the mastering plan technically sound and consistent?
+
+      DECISION:
+        - "approve" if the production is complete, cohesive, and release-ready for this stage
+        - "rework" if there are production quality or cohesion issues that need addressing
+          (specify exactly which tracks and what needs to change)
+    capabilities:
+      mutates_state: false
+      writes_files: false
+    decision_contract:
+      required_fields: [verdict, reasoning]
+
+  # ─── Phase 10: Design Artwork ─────────────────────────────────────────────
+  design-artwork:
+    mode: agent
+    agent: art-director
+    directive: |
+      Design the complete visual identity for this album.
+
+      READ:
+        - data/album-concept.json
+        - data/track-listing.json
+        - data/lyrics-summary.json
+
+      TASKS:
+        1. Develop the overarching visual concept that reflects the album's narrative and mood
+        2. Define color palette: 3–5 colors with hex codes and their emotional role
+        3. Specify typography: font style (serif/sans/display), weight, hierarchy rules
+        4. Write 3 album cover image generation prompts (primary, atmospheric, minimalist variants)
+        5. Write visual motif descriptions for the top 3 potential singles (for singles artwork)
+        6. Define the visual world rules (what makes something look like "this album's art")
+
+      OUTPUT:
+        data/artwork-brief.json:
+          {
+            "visual_concept": "...",
+            "color_palette": [
+              {"hex": "#1a1a2e", "name": "deep midnight", "role": "primary background"}
+            ],
+            "typography": {
+              "artist_name": "bold condensed sans, all-caps, tracked out",
+              "album_title": "light weight serif, mixed case",
+              "hierarchy": "..."
+            },
+            "cover_prompts": [
+              {
+                "variant": "primary",
+                "prompt": "...",
+                "negative_prompt": "text, words, blurry, low quality, watermark"
+              }
+            ],
+            "singles_motifs": [
+              {"track_title": "...", "visual_motif": "..."}
+            ]
+          }
+    capabilities:
+      mutates_state: true
+      writes_files: true
+
+  # ─── Phase 11: Generate Artwork (Command) ─────────────────────────────────
+  generate-artwork:
+    mode: command
+    command:
+      program: bash
+      args: ["-c", "bash scripts/generate-artwork.sh"]
+      cwd_mode: project_root
+      timeout_secs: 300
+    directive: |
+      Execute scripts/generate-artwork.sh to generate album cover artwork via Replicate API.
+      Reads data/artwork-brief.json and generates 3 variants to output/artwork/.
+      Falls back to placeholder images if REPLICATE_API_TOKEN is not set.
+
+  # ─── Phase 12: Write Liner Notes ─────────────────────────────────────────
+  write-liner-notes:
+    mode: agent
+    agent: creative-director
+    directive: |
+      Write the complete liner notes for this album.
+
+      READ:
+        - data/album-concept.json
+        - data/track-listing.json
+        - data/lyrics-summary.json
+        - data/compositions-summary.json
+        - data/production-summary.json
+        - config/album-brief.yaml
+
+      WRITE output/liner-notes.md with these sections:
+        1. Artist statement (2–3 paragraphs about the album's meaning and creation)
+        2. Track-by-track commentary (1–2 paragraphs per track: inspiration, production notes, lyrical meaning)
+        3. Credits (producer, mixers, mastering engineer, session musicians, featured artists)
+        4. Thank-yous (personalized, authentic-sounding, not generic)
+        5. Licensing info placeholder block (℗ & © year, label/distributor, ISRC codes as placeholders)
+
+      The liner notes should feel personal, literary, and give fans genuine insight into the creative process.
+      Write in first person from the artist's perspective.
+    capabilities:
+      mutates_state: true
+      writes_files: true
+
+  # ─── Phase 13: Prepare Distribution Metadata (Command) ───────────────────
+  prepare-distribution:
+    mode: command
+    command:
+      program: bash
+      args: ["-c", "bash scripts/prepare-metadata.sh"]
+      cwd_mode: project_root
+      timeout_secs: 120
+    directive: |
+      Execute scripts/prepare-metadata.sh to compile distribution-ready metadata.
+      Reads all data files and writes output/distribution-metadata.json and output/credits.txt.
+
+  # ─── Phase 14: Plan Marketing ─────────────────────────────────────────────
+  plan-marketing:
+    mode: agent
+    agent: marketing-strategist
+    directive: |
+      Create a comprehensive marketing and release strategy for this album.
+
+      READ:
+        - data/album-concept.json
+        - data/track-listing.json
+        - data/artwork-brief.json
+        - output/distribution-metadata.json
+        - config/distribution-config.yaml
+        - config/album-brief.yaml
+
+      USE fetch MCP to research:
+        - Current editorial playlist categories on Spotify for this genre
+        - Recent release strategies from similar artists in this genre
+        - Music media outlets that cover this genre (blogs, magazines, YouTube channels)
+
+      WRITE output/marketing-plan.md with:
+        1. Release timeline (8-week calendar from lead single to album drop)
+        2. Single selection rationale (which tracks, in which order, why)
+        3. Playlist pitching strategy (specific playlist names, pitch angles, curator contact approach)
+        4. Social media content calendar (week-by-week content ideas per platform)
+        5. Press strategy (target outlets, story angles, outreach timeline)
+        6. Budget breakdown at 3 tiers: $0 (organic only), $500, $2000
+        7. KPIs to track success (streams, saves, playlist adds, press mentions)
+
+      WRITE output/press-release.md as a properly formatted press release:
+        - Headline and dateline
+        - Lead paragraph (who, what, when, where, why)
+        - Album story (2 paragraphs)
+        - Quote from the artist
+        - Track listing
+        - Release info and social links (as placeholders)
+        - Boilerplate bio
+    capabilities:
+      mutates_state: true
+      writes_files: true
+
+  # ─── Phase 15: Final Review (Decision Gate) ───────────────────────────────
+  final-review:
+    mode: agent
+    agent: creative-director
+    directive: |
+      Conduct the final review of the complete album package before signing off.
+
+      READ AND EVALUATE all deliverables:
+        - data/album-concept.json ✓ concept quality
+        - data/track-listing.json ✓ track sequencing
+        - data/lyrics-summary.json ✓ lyrical cohesion
+        - data/compositions-summary.json ✓ harmonic coherence
+        - data/production-summary.json ✓ sonic vision
+        - data/mastering-plan.json ✓ technical readiness
+        - data/artwork-brief.json ✓ visual identity
+        - output/liner-notes.md ✓ narrative and credits
+        - output/distribution-metadata.json ✓ metadata completeness
+        - output/marketing-plan.md ✓ release strategy
+        - output/press-release.md ✓ press readiness
+
+      FINAL CHECKLIST:
+        □ All tracks have complete creative, production, and mastering specs
+        □ Artwork concept is strong and consistent with album narrative
+        □ Liner notes are personal, complete, and credit everyone appropriately
+        □ Distribution metadata is accurate and complete (no missing required fields)
+        □ Marketing plan is specific, actionable, and realistic for the genre
+        □ Press release is professionally written and tells a compelling story
+
+      DECISION:
+        - "approve" if the package is complete and release-ready (all checklist items pass)
+        - "rework" if marketing or release materials need revision (specify exactly what)
+    capabilities:
+      mutates_state: false
+      writes_files: false
+    decision_contract:
+      required_fields: [verdict, reasoning]

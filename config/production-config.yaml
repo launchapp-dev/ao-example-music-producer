@@ -1,0 +1,30 @@
+# Production Configuration
+# Controls audio generation, mastering targets, and artwork generation settings.
+
+# Audio Generation (via Replicate API)
+audio_generation:
+  model: "meta/musicgen:large"
+  # Alternative models:
+  #   meta/musicgen:stereo-large  (stereo output)
+  #   riffusion/riffusion         (spectrogram-based)
+  duration_secs: 30       # Duration per generated clip (max varies by model)
+  output_format: "wav"
+  sample_rate: 44100
+  fallback_on_no_api_key: true  # Create placeholder files if no Replicate key
+
+# Mastering Targets (streaming standards)
+mastering:
+  loudness_target_lufs: -14    # Spotify/Apple Music recommendation
+  true_peak_ceiling_dbtp: -1.0
+  sample_rate: 44100
+  bit_depth: 24
+
+# Artwork Generation (via Replicate API)
+artwork:
+  model: "stability-ai/sdxl:39ed52f2319f9c8fef5bc7df-dev"
+  # Fallback: stability-ai/stable-diffusion
+  width: 1024    # SDXL native; scripts upscale to 3000x3000
+  height: 1024
+  num_variants: 3
+  output_format: "png"
+  fallback_on_no_api_key: true  # Create placeholder images if no Replicate key

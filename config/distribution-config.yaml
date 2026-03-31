@@ -1,0 +1,43 @@
+# Distribution Configuration
+# Controls how the album is prepared for digital distribution.
+
+# Distributor
+primary_distributor: "DistroKid"
+# Alternatives: TuneCore, CD Baby, AWAL, Amuse
+
+# Platform Priorities (in order of focus)
+platforms:
+  - name: "Spotify"
+    priority: 1
+    target: "editorial playlist pitching"
+  - name: "Apple Music"
+    priority: 2
+    target: "New Music Daily, A-List Indie Electronic"
+  - name: "YouTube Music"
+    priority: 3
+    target: "topic channel + official artist channel"
+  - name: "Amazon Music"
+    priority: 4
+    target: "Alexa voice distribution"
+  - name: "Tidal"
+    priority: 5
+    target: "hi-fi audiophile audience"
+  - name: "Bandcamp"
+    priority: 6
+    target: "direct fan sales + vinyl pre-orders"
+
+# Metadata
+genre_classification:
+  primary: "Electronic"
+  secondary: "Indie Pop"
+  tertiary: "Dream Pop"
+
+language: "English"
+copyright_holder: "Nova Dusk"  # Replace with artist/label legal name
+label_name: "Self-released"
+territory: "Worldwide"
+parental_advisory: false
+
+# Identifiers (filled in by distributor)
+upc: "PLACEHOLDER"
+isrc_prefix: "PLACEHOLDER"  # Assigned by distributor per track

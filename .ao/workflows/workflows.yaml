@@ -1,0 +1,46 @@
+default_workflow_ref: album-production
+
+workflows:
+  - id: album-production
+    name: "Album Production Pipeline"
+    description: >
+      Full album production from concept to release-ready package.
+      Covers creative development, lyrics, composition, production, audio generation,
+      artwork, liner notes, distribution metadata, and marketing strategy.
+      Includes three decision gates (concept review, production review, final review)
+      with rework routing.
+    phases:
+      - develop-concept
+      - review-concept:
+          on_verdict:
+            rework:
+              target: develop-concept
+          max_rework_attempts: 2
+      - write-lyrics
+      - compose-tracks
+      - produce-tracks
+      - generate-reference-audio
+      - analyze-audio
+      - master-collection
+      - review-production:
+          on_verdict:
+            rework:
+              target: produce-tracks
+          max_rework_attempts: 2
+      - design-artwork
+      - generate-artwork
+      - write-liner-notes
+      - prepare-distribution
+      - plan-marketing
+      - final-review:
+          on_verdict:
+            rework:
+              target: plan-marketing
+          max_rework_attempts: 1
+    post_success:
+      merge:
+        strategy: squash
+        target_branch: main
+        create_pr: true
+        auto_merge: true
+        cleanup_worktree: true
